@@ -24,8 +24,8 @@ App.prototype.setup = function () {
     // form to create new todo
     this.$createTodo = $('#create-todo');
     var self = this;
-    this.$createTodo.on('submit', function () {
-      this.createTodoClicked(self);
+    this.$createTodo.on('submit', function (event) {
+      self.createTodoClicked(event);
     });
 
     // compile handlebars template
@@ -39,6 +39,7 @@ App.prototype.setup = function () {
 
 App.prototype.render = function() {
   // empty existing todos from view
+  console.log(this.allTodos);
   this.$todosList.empty();
 
   // pass `allTodos` into the template function
@@ -58,7 +59,7 @@ App.prototype.getTodos = function() {
       console.log(json);
 
       // set `allTodos` to todo data (json.data) from API
-      this.allTodos = json.todos;
+      self.allTodos = json.todos;
 
       // render all todos to view
       self.render();
@@ -67,13 +68,13 @@ App.prototype.getTodos = function() {
 };
 
 
-App.prototype.createTodoClicked = function (event,self) {
-  console.log(self);
-  console.log(self.baseUrl);
+App.prototype.createTodoClicked = function (event) {
+  var self = this;
   event.preventDefault();
 
   // serialze form data
-  var newTodo = $(self).serialize();
+  var newTodo = $(this.$createTodo).serialize();
+  console.log(newTodo);
 
   // POST request to create new todo
   $.ajax({
@@ -84,10 +85,14 @@ App.prototype.createTodoClicked = function (event,self) {
       console.log(json);
 
       // add new todo to `allTodos`
-      allTodos.push(json);
+      self.allTodos.push(json);
 
       // render all todos to view
-      render();
+      self.render();
     }
   });
+
+  this.$createTodo[0].reset();
+  this.$createTodo.find('input').first().focus();
+
 }
